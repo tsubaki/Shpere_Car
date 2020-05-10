@@ -6,51 +6,35 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
-    Item[] _items = null;
-    Car _car = null;
 
-    int _itemCount = int.MaxValue;
-
-    [SerializeField] Text _label;
-
-    [SerializeField] GameObject _youWinUI, _gameStartUI;
+    [SerializeField] GameObject _youWinUI, _youLose, _gameStartUI;
 
     IEnumerator Start()
     {
         // ゲームが使用するオブジェクトを収集
-        _items = FindObjectsOfType<Item>();
-        _car = FindObjectOfType<Car>();
+        var objective = GetComponent<IObjective>();
+        var car = FindObjectOfType<Car>();
 
         // ゲームイントロの設定
-        _car?.SetControllable(false);
+        objective.SetEnabled(false);
+        car?.SetControllable(false);
         _youWinUI?.SetActive(false);
+        _youLose?.SetActive(false);
         _gameStartUI?.SetActive(true);
         yield return new WaitForSeconds(3);
 
         // ゲーム中の設定
-        _car?.SetControllable(true);
+        objective.SetEnabled(true);
+        car?.SetControllable(true);
         _gameStartUI?.SetActive(false);
         // アイテム数が0になるまで処理を遅延
-        yield return new WaitUntil(() => _itemCount == 0);
+        yield return new WaitUntil(() => objective.IsDone);
 
         // ゲーム終了の設定
-        _youWinUI?.SetActive(true);
+        objective.SetEnabled(false);
+        if( objective.IsSuccess )
+            _youWinUI?.SetActive(true);
+        else
+            _youLose?.SetActive(true);
     }
-
-    void Update()
-    {
-        // 情報の更新は5フレームに1回
-        if( Time.frameCount % 5 != 0) return;
-
-        // 残りのアイテム数を計算
-        var contactItemCount = 0;
-        foreach( var item in _items)
-        {
-            if( item.IsContacted )
-                contactItemCount ++;
-        }
-        _itemCount =  _items.Length - contactItemCount;
-        _label.text = $"ノコリ { _itemCount } コ";
-    }
-
 }
