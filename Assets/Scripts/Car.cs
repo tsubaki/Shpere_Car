@@ -15,10 +15,9 @@ public class Car : MonoBehaviour
     Transform _carTransform;
 
     bool _controllable = true;
-    float _handle;
     bool _isGround;
     Quaternion _carRotation;
-    Vector3 CarForward{ get=> _carRotation * Vector3.forward ; }
+    Vector3 CarForward { get => _carRotation * Vector3.forward; }
 
     void Awake()
     {
@@ -47,16 +46,16 @@ public class Car : MonoBehaviour
     void Update()
     {
         // モデルの向きと移動方向が一致していない & 接地していればドリフト
-        var isDrifting = Vector3.Dot( CarForward.normalized, _rig.velocity.normalized) < 0.866f;
+        var isDrifting = Vector3.Dot(CarForward.normalized, _rig.velocity.normalized) < 0.866f;
         _isGround = Physics.Raycast(transform.position, Vector3.down, _offset.y * -1.1f);
         _emissionModule.enabled = isDrifting && _isGround;
 
         // 操作可能ならハンドル操作を受け付ける
-        if (_controllable && _isGround )
+        if (_controllable)
         {
-            _handle = Input.GetAxis("Horizontal");
-            _carAnimator.SetFloat("Handle", _handle, 0.1f, Time.deltaTime);
-            _carRotation *= Quaternion.AngleAxis(_handle * _handlingPower * _power * 0.10f, Vector3.up);
+            var handle = Input.GetAxis("Horizontal");
+            _carAnimator.SetFloat("Handle", handle, 0.1f, Time.deltaTime);
+            _carRotation *= Quaternion.AngleAxis(handle * _handlingPower * _power * 0.10f, Vector3.up);
         }
     }
 
@@ -65,4 +64,3 @@ public class Car : MonoBehaviour
         _controllable = value;
     }
 }
-
