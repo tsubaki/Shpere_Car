@@ -8,6 +8,7 @@ public class GameController : MonoBehaviour
 {
 
     [SerializeField] GameObject _youWinUI, _youLose, _gameStartUI;
+    [SerializeField] SceneSet currentScene, nextScene;
 
     IEnumerator Start()
     {
@@ -36,5 +37,10 @@ public class GameController : MonoBehaviour
             _youWinUI?.SetActive(true);
         else
             _youLose?.SetActive(true);
+
+        yield return new WaitUntil(() => Input.GetMouseButton(0));
+
+        currentScene.Unload();
+        nextScene.Load();
     }
 }

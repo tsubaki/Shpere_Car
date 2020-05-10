@@ -6,7 +6,7 @@ public class Car : MonoBehaviour
     [SerializeField] ParticleSystem _particle; // カーブ時のパーティクル
     [SerializeField] GameObject _car; // 車のガワ
     [Range(4, 10)] [SerializeField] float _power = 9f; // エンジン出力
-    [Range(0, 2)] [SerializeField] float _handlingPower = 1f; // 曲がる力
+    [Range(5, 20)] [SerializeField] float _handlingPower = 1f; // 曲がる力
     [SerializeField] Vector3 _offset; // 玉と車モデルのギャップを埋めるオフセット
 
     Rigidbody _rig;
@@ -55,7 +55,7 @@ public class Car : MonoBehaviour
         {
             var handle = Input.GetAxis("Horizontal");
             _carAnimator.SetFloat("Handle", handle, 0.1f, Time.deltaTime);
-            _carRotation *= Quaternion.AngleAxis(handle * _handlingPower * _power * 0.10f, Vector3.up);
+            _carRotation *= Quaternion.AngleAxis(handle * _handlingPower * _power * Time.deltaTime, Vector3.up);
         }
     }
 
