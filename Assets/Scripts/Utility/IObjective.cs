@@ -5,3 +5,8 @@ public interface IObjective
     void SetEnabled(bool value);
 
 }
+
+public interface IPlayer
+{
+    void SetControllable(bool value);
+}

@@ -1,7 +1,8 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class Car : MonoBehaviour
+public class Car : MonoBehaviour, IPlayer
 {
     [SerializeField] ParticleSystem _particle; // カーブ時のパーティクル
     [SerializeField] GameObject _car; // 車のガワ
@@ -10,6 +11,7 @@ public class Car : MonoBehaviour
     [SerializeField] Vector3 _offset; // 玉と車モデルのギャップを埋めるオフセット
 
     Rigidbody _rig;
+    PlayerInput _input;
     ParticleSystem.EmissionModule _emissionModule;
     Animator _carAnimator;
     Transform _carTransform;
@@ -22,6 +24,7 @@ public class Car : MonoBehaviour
     void Awake()
     {
         _rig = GetComponent<Rigidbody>();
+        _input = GetComponent<PlayerInput>();
         _emissionModule = _particle.emission;
     }
 
@@ -53,7 +56,7 @@ public class Car : MonoBehaviour
         // 操作可能ならハンドル操作を受け付ける
         if (_controllable)
         {
-            var handle = Input.GetAxis("Horizontal");
+            var handle = _input.currentActionMap["Handle"].ReadValue<float>();
             _carAnimator.SetFloat("Handle", handle, 0.1f, Time.deltaTime);
             _carRotation *= Quaternion.AngleAxis(handle * _handlingPower * _power * Time.deltaTime, Vector3.up);
         }

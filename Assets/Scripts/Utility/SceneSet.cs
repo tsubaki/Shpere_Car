@@ -17,21 +17,21 @@ public class SceneSet : ScriptableObject
         var obj = new GameObject("SceneSetController");
         Instance = obj.AddComponent<Dummy>();
         DontDestroyOnLoad(obj);
-        SceneManager.LoadScene("Dummy", LoadSceneMode.Additive);
+        SceneManager.LoadScene("Loading", LoadSceneMode.Additive);
     }
 
     public void Load()
     {
-        Instance.StartCoroutine(LoadScene());
+        Instance.StartCoroutine(LoadSceneCoroutine());
     }
 
     public void Unload()
     {
-        Instance.StartCoroutine(UnloadScene());
+        Instance.StartCoroutine(UnloadSceneCoroutine());
     }
 
 #if !UNITY_WEBGL  
-    public IEnumerator LoadScene()
+    public IEnumerator LoadSceneCoroutine()
     {
         var ops = new AsyncOperation[sceneNames.Length];
         for (int i = 0; i < ops.Length; i++)
@@ -58,7 +58,7 @@ public class SceneSet : ScriptableObject
         }
     }
 
-    public IEnumerator UnloadScene()
+    public IEnumerator UnloadSceneCoroutine()
     {
         var ops = new AsyncOperation[sceneNames.Length];
         for (int i = 0; i < ops.Length; i++)
@@ -67,11 +67,19 @@ public class SceneSet : ScriptableObject
             ops[i] = op;
         }
 
-        yield return null;
+        yield return new WaitUntil(() =>
+        {
+            var result = true;
+            for (int i = 0; i < ops.Length; i++)
+            {
+                result = result && ops[i].isDone;
+            }
+            return result;
+        });
     }
 #else
  
-   public IEnumerator LoadScene()
+   public IEnumerator LoadSceneCoroutine()
     {
         var ops = new AsyncOperation[sceneNames.Length];
         for (int i = 0; i < ops.Length; i++)
@@ -81,7 +89,7 @@ public class SceneSet : ScriptableObject
         yield return null;
     }
 
-    public IEnumerator UnloadScene()
+    public IEnumerator UnloadSceneCoroutine()
     {
         var ops = new AsyncOperation[sceneNames.Length];
         for (int i = 0; i < ops.Length; i++)
